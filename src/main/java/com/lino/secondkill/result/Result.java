@@ -6,7 +6,7 @@ public class Result {
     private Object data;
 
     /*成功时调用*/
-    public static Object success(Object data){
+    public static Result success(Object data){
         return new Result(data);
     }
     private Result(Object data){
@@ -15,7 +15,7 @@ public class Result {
         this.data=data;
     }
     /*失败时调用*/
-    public static Object error(CodeMsg cm){
+    public static Result error(CodeMsg cm){
         return new Result(cm);
     }
     private Result(CodeMsg cm){
