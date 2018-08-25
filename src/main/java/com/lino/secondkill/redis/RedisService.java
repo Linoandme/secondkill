@@ -1,16 +1,12 @@
-package com.lino.secondkill.service;
+package com.lino.secondkill.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.lino.secondkill.redis.KeyPrefix;
-import com.lino.secondkill.redis.RedisConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 @Service
 public class RedisService {
@@ -49,6 +45,7 @@ public class RedisService {
         }else{
             return JSON.toJavaObject(JSON.parseObject(str),clazz);
         }
+        
     }
 
     /*

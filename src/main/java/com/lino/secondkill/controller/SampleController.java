@@ -6,7 +6,7 @@ package com.lino.secondkill.controller;
 import com.lino.secondkill.domain.User;
 import com.lino.secondkill.redis.UserKey;
 import com.lino.secondkill.result.Result;
-import com.lino.secondkill.service.RedisService;
+import com.lino.secondkill.redis.RedisService;
 import com.lino.secondkill.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

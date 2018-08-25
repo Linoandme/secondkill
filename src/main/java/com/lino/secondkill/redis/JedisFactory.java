@@ -1,4 +1,4 @@
-package com.lino.secondkill.service;
+package com.lino.secondkill.redis;
 
 import com.lino.secondkill.redis.RedisConfig;
 import org.springframework.beans.factory.annotation.Autowired;
