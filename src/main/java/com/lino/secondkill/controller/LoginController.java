@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Controller
@@ -31,24 +32,10 @@ public class LoginController {
 
     @PostMapping(value = "do_login")
     @ResponseBody
-    public Result doLogin(@Valid LoginVo loginVo){
+    public Result doLogin(HttpServletResponse response, @Valid LoginVo loginVo){
         logger.info(loginVo.toString());
-
-        //参数校验
-        String mobile = loginVo.getMobile();
-        String password = loginVo.getPassword();
-        if(StringUtils.isEmpty(password)){
-            return Result.error(CodeMsg.PASSWORD_EMPTY);
-        }
-        if(!ValidatorUtil.isMobile(mobile)){
-            return Result.error(CodeMsg.MOBILE_ERROR);
-        }
-        CodeMsg cm = loginService.login(loginVo);
-        if(cm.getCode()==0){
-            return Result.success(true);
-        }else{
-            return Result.error(cm);
-        }
+       boolean flag = loginService.login(response,loginVo);
+        return Result.success("登陆成功");
     }
 
 }

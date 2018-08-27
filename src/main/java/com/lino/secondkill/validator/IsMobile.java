@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(
-        validatedBy = {}
+        validatedBy = {IsMobileValidator.class}
 )
 public @interface IsMobile {
     boolean required() default true;
