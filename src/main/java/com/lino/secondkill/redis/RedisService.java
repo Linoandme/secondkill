@@ -22,7 +22,7 @@ public class RedisService {
             jedis=jp.getResource();
             //真正的key
             String realKey = prefix.getPrefix()+key;
-            logger.info("\n============================redis获取的key："+realKey);
+            logger.info("============================redis获取的key："+realKey);
 
             String str= jedis.get(realKey);
             T t= stringToBean(str,clazz);
@@ -57,6 +57,7 @@ public class RedisService {
             jedis=jp.getResource();
             //真正的key
             String realKey = prefix.getPrefix()+key;
+            logger.info("================realkey:"+realKey);
             String str= beanToString(value);
             if(str==null || str.length()<=0) return false;
             //过期操作
@@ -139,6 +140,23 @@ public class RedisService {
         }
     }
 
+
+
+    /*
+     * 删除
+     * */
+    public <T> boolean delete(KeyPrefix prefix, String key){
+        Jedis jedis = null;
+        try {
+            jedis=jp.getResource();
+            //真正的key
+            String realKey = prefix.getPrefix()+key;
+            Long del = jedis.del(realKey);
+            return del>0;
+        }finally {
+            returnToPool(jedis);
+        }
+    }
 
 
 }

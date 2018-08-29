@@ -34,8 +34,8 @@ public class LoginController {
     @ResponseBody
     public Result doLogin(HttpServletResponse response, @Valid LoginVo loginVo){
         logger.info(loginVo.toString());
-       boolean flag = loginService.login(response,loginVo);
-        return Result.success("登陆成功");
+       String token = loginService.login(response,loginVo);
+        return Result.success(token);
     }
 
 }

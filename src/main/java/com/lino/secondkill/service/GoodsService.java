@@ -23,7 +23,7 @@ public class GoodsService {
 
     public void reduceStock(GoodsVo goods) {
         SecondkillGoods secondkillGoods = new SecondkillGoods();
-        secondkillGoods.setId(goods.getId());
+        secondkillGoods.setGoods_id(goods.getGoods_id());
         goodsDao.reduceStock(secondkillGoods);
     }
 }

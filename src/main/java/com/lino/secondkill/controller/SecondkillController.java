@@ -8,15 +8,23 @@ import com.lino.secondkill.service.GoodsService;
 import com.lino.secondkill.service.OrderService;
 import com.lino.secondkill.service.SecondkillService;
 import com.lino.secondkill.vo.GoodsVo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
+
 @Controller
 @RequestMapping(value = "/SecondkillController")
 public class SecondkillController {
+
+    private static Logger logger = LoggerFactory.getLogger(SecondkillController.class);
+
+
     @Autowired
     private SecondkillService secondkillService;
 
@@ -27,10 +35,15 @@ public class SecondkillController {
     private OrderService orderService;
 
 
-
+    /*
+    * 压测数据：qps:66
+    *
+    * 2000*10
+    * */
 
     @RequestMapping(value = "/secondkill")
     public String secondkill(Model model, SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id){
+        logger.info("=======================SecondController--secondkill:");
         if(secondkillUser==null) return "login";
         GoodsVo goods = goodsService.getGoodsByGoodsId(goods_id);
         //判断库存

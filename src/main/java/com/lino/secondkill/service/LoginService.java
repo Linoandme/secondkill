@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.lino.secondkill.dao.LoginDao;
 import com.lino.secondkill.domain.SecondkillUser;
 import com.lino.secondkill.exception.GlobalException;
+import com.lino.secondkill.redis.GoodsKey;
 import com.lino.secondkill.redis.RedisService;
 import com.lino.secondkill.redis.SecondkillUserKey;
 import com.lino.secondkill.result.CodeMsg;
@@ -27,12 +28,12 @@ public class LoginService {
     private RedisService redisService;
     @Autowired
     private LoginDao loginDao;
-    public boolean login(HttpServletResponse response,LoginVo loginVo) {
+    public String login(HttpServletResponse response,LoginVo loginVo) {
         if(loginVo==null){
             throw new GlobalException(CodeMsg.SERVER_ERROR);
         }
         //判断是否有该用户
-        SecondkillUser user =loginDao.getUserById(Long.parseLong(loginVo.getMobile()));
+        SecondkillUser user =getUserById(Long.parseLong(loginVo.getMobile()));
         logger.info("数据库秒杀用户："+ JSON.toJSONString(user));
         if(user==null){
             throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
@@ -48,6 +49,39 @@ public class LoginService {
 
         String token = UUIDUtil.uuid();
         addCookie(response,token,user);
+        return token;
+    }
+
+    private SecondkillUser getUserById(long id) {
+        //取缓存
+        SecondkillUser secondkillUser =redisService.get(SecondkillUserKey.getById,""+id,SecondkillUser.class);
+        if(secondkillUser!=null) return secondkillUser;
+
+        //取数据库
+        secondkillUser = loginDao.getUserById(id);
+        //添加缓存
+        if(secondkillUser!=null){
+            redisService.set(SecondkillUserKey.getById,""+id,secondkillUser);
+        }
+        return secondkillUser;
+    }
+
+    //更新信息同时更新缓存
+    public boolean updatePassword(String token ,long id,String passwordNew){
+        SecondkillUser secondkillUser = loginDao.getUserById(id);
+
+
+
+        //重新新建一个，提高效率
+        SecondkillUser user = new SecondkillUser();
+        user.setPassword( MD5Util.formPassToDbPass(passwordNew,secondkillUser.getSalt()));
+        user.setId(id);
+        loginDao.update(user);
+
+
+        //更新缓存信息
+        redisService.set(SecondkillUserKey.token,token,user);
+        redisService.delete(SecondkillUserKey.getById,""+id);
         return true;
     }
 

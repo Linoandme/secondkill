@@ -14,7 +14,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     UserArgumentResolver userArgumentResolver;
 
 
-    //方法用处：给参数赋值的，框架会回调这个方法，往controller里面的方法给他赋值
+    //方法用处：给参数赋值的，框架会回调这个方法，往controller里面的参数给他赋值
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         //往argumentResolvers里面添加一个值
