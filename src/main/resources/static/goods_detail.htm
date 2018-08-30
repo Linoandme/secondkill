@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html >
+<head>
+    <title>商品详情</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!-- jquery -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" src="/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/jquery-validation/localization/messages_zh.min.js"></script>
+    <!-- layer -->
+    <script type="text/javascript" src="/layer/layer.js"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" src="/js/md5.min.js"></script>
+    <!-- common.js -->
+    <script type="text/javascript" src="/js/common.js"></script>
+</head>
+<body>
+
+<div class="panel panel-default">
+  <div class="panel-heading">秒杀商品详情</div>
+  <div class="panel-body">
+  	<span if="${user eq null}"> 您还没有登录，请登陆后再操作<br/></span>
+  	<span>没有收货地址的提示。。。</span>
+  </div>
+  <table class="table" id="goodslist">
+  	<tr>  
+        <td>商品名称</td>  
+        <td colspan="3" id="goods_name"></td>
+     </tr>  
+     <tr>  
+        <td>商品图片</td>  
+        <td colspan="3"><img id="goods_img" width="200" height="200" /></td>
+     </tr>
+     <tr>  
+        <td>秒杀开始时间</td>  
+        <td id="start_date"></td>
+        <td >
+        	<input type="hidden" id="remainSeconds"  />
+        	<span id="miaoshaTip"></span>
+        </td>
+        <td>
+        	<form id="miaoshaForm" method="post" action="/SecondkillController/secondkill">
+        		<button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
+        		<input type="hidden" name="goods_id" id="goods_id" />
+        	</form>
+        </td>
+     </tr>
+     <tr>  
+        <td>商品原价</td>  
+        <td colspan="3"  id ="goods_price"></td>
+     </tr>
+      <tr>  
+        <td>秒杀价</td>  
+        <td colspan="3" id="secondkill_price"></td>
+     </tr>
+     <tr>  
+        <td>库存数量</td>  
+        <td colspan="3" id="stock_count"></td>
+     </tr>
+  </table>
+</div>
+</body>
+<script>
+$(function(){
+	//countDown();
+    getDetail();
+});
+
+function getDetail() {
+    var goods_id = g_getQueryString("goods_id");
+    console.log(goods_id+"====");
+    $.ajax({
+        url:"/GoodsController/to_detail/"+goods_id,
+
+        type:"GET",
+        success:function (data) {
+            
+            if(data.code==0){
+                render(data.data);
+            }
+        },
+        error:function () {
+            layer.msg("请求错误");
+        }
+    
+    })
+}
+
+
+function render(detail) {
+    var  secondkillStatus = detail.secondkillStatus;
+    var  remainSeconds= detail.remainSeconds;
+    var  goodsVo= detail.goodsVo;
+    var  secondkillUser= detail.secondkillUser;
+    $("#goods_name").text(goodsVo.goods_name);
+    $("#goods_img").attr("src",goodsVo.goods_img);
+    $("#start_date").text(new Date(goodsVo.start_date).format("yyyy-MM-dd hh:mm:ss"));
+    $("#remainSeconds").val(remainSeconds);
+
+    $("#goods_id").val(goodsVo.id);
+    $("#goods_price").text(goodsVo.goods_price);
+    $("#secondkill_price").text(goodsVo.secondkill_price);
+    $("#stock_count").text(goodsVo.stock_count);
+    countDown();
+}
+
+function countDown(){
+	var remainSeconds = $("#remainSeconds").val();
+	var timeout;
+	if(remainSeconds > 0){//秒杀还没开始，倒计时
+		$("#buyButton").attr("disabled", true);
+        $("#miaoshaTip").html("秒杀倒计时："+remainSeconds+"秒");
+		timeout = setTimeout(function(){
+			$("#countDown").text(remainSeconds - 1);
+			$("#remainSeconds").val(remainSeconds - 1);
+			countDown();
+		},1000);
+	}else if(remainSeconds == 0){//秒杀进行中
+		$("#buyButton").attr("disabled", false);
+		if(timeout){
+			clearTimeout(timeout);
+		}
+		$("#miaoshaTip").html("秒杀进行中");
+	}else{//秒杀已经结束
+		$("#buyButton").attr("disabled", true);
+		$("#miaoshaTip").html("秒杀已经结束");
+	}
+}
+
+</script>
+</html>

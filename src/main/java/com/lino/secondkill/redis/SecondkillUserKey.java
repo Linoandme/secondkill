@@ -1,7 +1,7 @@
 package com.lino.secondkill.redis;
 
 public class SecondkillUserKey extends BasePrefix {
-    private static final int TOKEN_EXPIRE=3600*4;
+    private static final int TOKEN_EXPIRE=3600*24*5;
 
     //private 防止外面给实例化了
     private SecondkillUserKey(int expireSeconds,String prefix) {

@@ -69,15 +69,12 @@ public class LoginService {
     //更新信息同时更新缓存
     public boolean updatePassword(String token ,long id,String passwordNew){
         SecondkillUser secondkillUser = loginDao.getUserById(id);
-
-
-
         //重新新建一个，提高效率
         SecondkillUser user = new SecondkillUser();
         user.setPassword( MD5Util.formPassToDbPass(passwordNew,secondkillUser.getSalt()));
         user.setId(id);
         loginDao.update(user);
-
+        user.setSalt(secondkillUser.getSalt());
 
         //更新缓存信息
         redisService.set(SecondkillUserKey.token,token,user);

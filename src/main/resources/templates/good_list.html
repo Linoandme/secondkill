@@ -31,7 +31,7 @@
             <td th:text="${goods.goods_price}"></td>
             <td th:text="${goods.secondkill_price}"></td>
             <td th:text="${goods.stock_count}"></td>
-            <td><a th:href="'/GoodsController/to_detail/'+${goods.id}">详情</a></td>
+            <td><a th:href="'/goods_detail.htm?goods_id='+${goods.id}">详情</a></td>
         </tr>
     </table>
 </div>

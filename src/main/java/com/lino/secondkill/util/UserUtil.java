@@ -48,7 +48,7 @@ public class UserUtil {
 //			pstmt.setLong(6, user.getId());
 //			pstmt.addBatch();
 //		}
-//		pstmt.executeBatch();
+//		pstmt.executeBatch();:8080/GoodsController/to_list
 //		pstmt.close();
 //		conn.close();
 //		System.out.println("insert to db");

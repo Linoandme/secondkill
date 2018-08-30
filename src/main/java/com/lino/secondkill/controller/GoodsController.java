@@ -6,8 +6,10 @@ import com.lino.secondkill.domain.SecondkillUser;
 import com.lino.secondkill.redis.GoodsKey;
 import com.lino.secondkill.redis.RedisService;
 
+import com.lino.secondkill.result.Result;
 import com.lino.secondkill.service.GoodsService;
 
+import com.lino.secondkill.vo.GoodDetailVo;
 import com.lino.secondkill.vo.GoodsVo;
 
 import org.slf4j.Logger;
@@ -53,10 +55,12 @@ public class GoodsController {
                            HttpServletRequest request,
                           SecondkillUser secondkillUser
     ){
-        logger.info("========================GoodsController-tolist=================");
+        logger.info("GoodsController-tolist");
         if(secondkillUser == null){
-            return "login";
+            WebContext ctxx = new WebContext(request,response,request.getServletContext(),request.getLocale());
+            return thymeleafViewResolver.getTemplateEngine().process("login", ctxx);
         }
+        logger.info("GoodsController-tolist已登陆");
         List<GoodsVo> goodsVoList = goodsService.listGoodsVo();
         model.addAttribute("goodsVoList",goodsVoList);
       //  return "good_list";
@@ -69,8 +73,10 @@ public class GoodsController {
         //1.取缓存
         String html = redisService.get(GoodsKey.goodsList,"",String.class);
         if(!StringUtils.isEmpty(html)){
+            logger.info("商品列表取缓存");
             return html;
         }
+
         //2.手动渲染
         WebContext ctx = new WebContext(request,response,request.getServletContext(),request.getLocale(),model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("good_list", ctx);
@@ -80,10 +86,53 @@ public class GoodsController {
         }
         return html;
     }
+
+
+
+    //页面静态化的接口
     @RequestMapping(value = "/to_detail/{goods_id}")
     @ResponseBody
-    public String toDetail(Model model, SecondkillUser secondkillUser, @PathVariable("goods_id") long goods_id,HttpServletRequest request,HttpServletResponse response){
-        logger.info("========================GoodsController-toDetail=================");
+    public Result toDetail(Model model, SecondkillUser secondkillUser, @PathVariable("goods_id") long goods_id, HttpServletRequest request, HttpServletResponse response) {
+        logger.info("GoodsController-toDetail");
+
+        GoodsVo goodsVo=  goodsService.getGoodsByGoodsId(goods_id);
+        long start = goodsVo.getStart_date().getTime();
+        long end = goodsVo.getEnd_date().getTime();
+        long now = System.currentTimeMillis();
+
+        int secondkillStatus = 0;//0未开始，1进行中，2已经结束
+        int remainSeconds=0;
+        if(start>now){
+            secondkillStatus=0;
+            remainSeconds = (int) (start-now)/1000;
+        }else if (now >end){
+            secondkillStatus=2;
+        }else{
+            secondkillStatus=1;
+        }
+        model.addAttribute("secondkillStatus",secondkillStatus);
+        model.addAttribute("remainSeconds",remainSeconds);
+        model.addAttribute("goods",goodsVo);
+        model.addAttribute("user",secondkillUser);
+        GoodDetailVo goodDetailVo = new GoodDetailVo();
+        goodDetailVo.setGoodsVo(goodsVo);
+        goodDetailVo.setRemainSeconds(remainSeconds);
+        goodDetailVo.setSecondkillStatus(secondkillStatus);
+        goodDetailVo.setSecondkillUser(secondkillUser);
+        return Result.success(goodDetailVo);
+    }
+
+
+
+
+
+
+
+
+    @RequestMapping(value = "/to_detail2/{goods_id}")
+    @ResponseBody
+    public String toDetail2(Model model, SecondkillUser secondkillUser, @PathVariable("goods_id") long goods_id,HttpServletRequest request,HttpServletResponse response){
+        logger.info("GoodsController-toDetail");
         if(secondkillUser == null){
             return "login";
         }
@@ -92,8 +141,6 @@ public class GoodsController {
         if(!StringUtils.isEmpty(html)){
             return html;
         }
-
-
 
 
         GoodsVo goodsVo=  goodsService.getGoodsByGoodsId(goods_id);
