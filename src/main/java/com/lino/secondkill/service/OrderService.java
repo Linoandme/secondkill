@@ -5,6 +5,7 @@ import com.lino.secondkill.domain.OrderInfo;
 import com.lino.secondkill.domain.SecondkillOrder;
 import com.lino.secondkill.domain.SecondkillUser;
 import com.lino.secondkill.vo.GoodsVo;
+import com.lino.secondkill.vo.OrderDetail;
 import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,8 @@ public class OrderService {
     private static Logger logger = LoggerFactory.getLogger(OrderService.class);
     @Autowired
     private OrderDao orderDao;
+    @Autowired
+    private GoodsService goodsService;
 
     public SecondkillOrder getSecondkillOrderByUseridGoodsid(Long id, long goods_id) {
         return orderDao.getSecondkillOrderByUseridGoodsid(id,goods_id);
@@ -51,5 +54,10 @@ public class OrderService {
 
 
         return orderInfo;
+    }
+
+
+    public OrderInfo getOrderByOrderid(long order_id) {
+        return orderDao.getOrderByOrderid(order_id);
     }
 }

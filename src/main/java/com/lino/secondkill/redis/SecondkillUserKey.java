@@ -13,5 +13,5 @@ public class SecondkillUserKey extends BasePrefix {
 
 
     public static SecondkillUserKey token=new SecondkillUserKey(TOKEN_EXPIRE,"token");
-    public static SecondkillUserKey getById=new SecondkillUserKey("token");
+    public static SecondkillUserKey getById=new SecondkillUserKey("getById");
 }

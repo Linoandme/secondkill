@@ -43,10 +43,10 @@
         	<span id="miaoshaTip"></span>
         </td>
         <td>
-        	<form id="miaoshaForm" method="post" action="/SecondkillController/secondkill">
-        		<button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
+
+        		<button class="btn btn-primary btn-block"  id="buyButton" onclick="secondkillButon()">立即秒杀</button>
         		<input type="hidden" name="goods_id" id="goods_id" />
-        	</form>
+
         </td>
      </tr>
      <tr>  
@@ -69,6 +69,39 @@ $(function(){
 	//countDown();
     getDetail();
 });
+
+
+
+function secondkillButon() {
+    console.log("====secondkill====================");
+    $.ajax({
+        url:"/SecondkillController/secondkill",
+        type:"POST",
+        data:{
+            goods_id:$("#goods_id").val()
+        },
+        success:function (data) {
+            console.log("====secondkill");
+            if(data.code==0){
+                window.location.href="/order_detail.htm?order_id="+data.data.orderInfo.id;
+            }else{
+                layer.msg(data.msg);
+            }
+        },
+
+
+        error:function () {
+            layer("秒杀按钮请求错误");
+        }
+
+    })
+
+
+
+
+
+        }
+
 
 function getDetail() {
     var goods_id = g_getQueryString("goods_id");

@@ -20,4 +20,7 @@ public interface OrderDao {
 
     @Insert("insert into secondkill_order (goods_id,order_id,user_id) values(#{goods_id},#{order_id},#{user_id})")
     public int insertSecondkillOrder(SecondkillOrder secondkillOrder);
+
+    @Select("select * from order_info where id = #{order_id}")
+    public OrderInfo getOrderByOrderid( long order_id);
 }
