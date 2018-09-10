@@ -4,6 +4,7 @@ package com.lino.secondkill.controller;
 
 
 import com.lino.secondkill.domain.User;
+import com.lino.secondkill.rabbitmq.MQSender;
 import com.lino.secondkill.redis.UserKey;
 import com.lino.secondkill.result.Result;
 import com.lino.secondkill.redis.RedisService;
@@ -24,9 +25,20 @@ public class SampleController {
     private UserService userService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private MQSender mqSender;
     @GetMapping(value = "/demo")
     public String thymeleaf(Model model){
         model.addAttribute("name","lino");
+        return "hello";
+    }
+
+
+
+
+    @GetMapping(value = "/mq")
+    public String thymeleafa(Model model){
+        mqSender.send("hello lino,hard;");
         return "hello";
     }
 

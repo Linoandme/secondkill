@@ -55,7 +55,10 @@ public class LoginService {
     private SecondkillUser getUserById(long id) {
         //取缓存
         SecondkillUser secondkillUser =redisService.get(SecondkillUserKey.getById,""+id,SecondkillUser.class);
-        if(secondkillUser!=null) return secondkillUser;
+        if(secondkillUser!=null) {
+            logger.info("缓存获取的用户信息========");
+            return secondkillUser;
+        }
 
         //取数据库
         secondkillUser = loginDao.getUserById(id);

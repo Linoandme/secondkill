@@ -32,7 +32,7 @@ public class RedisService {
         }
     }
 //将字符串转换成bean
-    private <T> T stringToBean(String str, Class<T> clazz) {
+    public static <T> T stringToBean(String str, Class<T> clazz) {
          if(str==null || str.length()<=0||clazz==null){
              return null;
          }
@@ -75,7 +75,7 @@ public class RedisService {
         }
     }
 //bean转换成字符串
-    private <T> String beanToString(T value) {
+    public static <T> String beanToString(T value) {
         if(value==null){
             return null;
         }
