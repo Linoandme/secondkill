@@ -35,23 +35,23 @@ public class UserUtil {
 		}
 		System.out.println("create user");
 //		//插入数据库
-//		Connection conn = DBUtil.getConn();
-//		String sql = "insert into secondkill_user(login_count, nickname, register_date, salt, password, id)values(?,?,?,?,?,?)";
-//		PreparedStatement pstmt = conn.prepareStatement(sql);
-//		for(int i=0;i<users.size();i++) {
-//			SecondkillUser user = users.get(i);
-//			pstmt.setInt(1, user.getLogin_count());
-//			pstmt.setString(2, user.getNickname());
-//			pstmt.setTimestamp(3, new Timestamp(user.getRegister_date().getTime()));
-//			pstmt.setString(4, user.getSalt());
-//			pstmt.setString(5, user.getPassword());
-//			pstmt.setLong(6, user.getId());
-//			pstmt.addBatch();
-//		}
-//		pstmt.executeBatch();:8080/GoodsController/to_list
-//		pstmt.close();
-//		conn.close();
-//		System.out.println("insert to db");
+		Connection conn = DBUtil.getConn();
+		String sql = "insert into secondkill_user(login_count, nickname, register_date, salt, password, id)values(?,?,?,?,?,?)";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		for(int i=0;i<users.size();i++) {
+			SecondkillUser user = users.get(i);
+			pstmt.setInt(1, user.getLogin_count());
+			pstmt.setString(2, user.getNickname());
+			pstmt.setTimestamp(3, new Timestamp(user.getRegister_date().getTime()));
+			pstmt.setString(4, user.getSalt());
+			pstmt.setString(5, user.getPassword());
+			pstmt.setLong(6, user.getId());
+			pstmt.addBatch();
+		}
+		pstmt.executeBatch();
+		pstmt.close();
+		conn.close();
+		System.out.println("insert to db");
 		//登录，生成token
 		String urlString = "http://localhost:8080/LoginController/do_login";
 		File file = new File("D:/tokens.txt");

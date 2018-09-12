@@ -11,6 +11,8 @@ import com.lino.secondkill.result.Result;
 import com.lino.secondkill.service.GoodsService;
 import com.lino.secondkill.service.OrderService;
 import com.lino.secondkill.service.SecondkillService;
+import com.lino.secondkill.util.MD5Util;
+import com.lino.secondkill.util.UUIDUtil;
 import com.lino.secondkill.vo.GoodsVo;
 import com.lino.secondkill.vo.OrderDetail;
 import com.lino.secondkill.vo.SecondkillMessage;
@@ -20,10 +22,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,9 +68,9 @@ public class SecondkillController implements InitializingBean {
     * 2000*10
     * */
 
-    @RequestMapping(value = "/secondkill" ,method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/secondkill" ,method = RequestMethod.POST)
     @ResponseBody
-    public Result secondkill( SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id){
+    public Result secondkill(SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id, @PathVariable("path")  String path){
         logger.info("=======================SecondController--secondkill:");
         if(secondkillUser==null) return Result.error(CodeMsg.SESSION_ERROR);
 
@@ -81,6 +80,12 @@ public class SecondkillController implements InitializingBean {
             return Result.error(CodeMsg.SECONDKILL_REPEATE);
         }
 
+
+        //验证path
+        boolean ispath = checkPath(secondkillUser,goods_id,path);
+        if(!ispath){
+            return Result.error(CodeMsg.REQUEST_ILLEAGE);
+        }
 
         //内存标记，减少redis访问
         Boolean flag = localOverMap.get(goods_id);
@@ -126,10 +131,13 @@ public class SecondkillController implements InitializingBean {
 
     }
 
-
-
-
-
+    private boolean checkPath(SecondkillUser secondkillUser, long goods_id, String path) {
+        if(secondkillUser==null||path==null){
+            return false;
+        }
+        String oldPath = redisService.get(GoodsKey.getPath,""+secondkillUser.getId()+"_"+goods_id,String.class);
+        return path.equals(oldPath);
+    }
 
 
     /*
@@ -149,5 +157,19 @@ public class SecondkillController implements InitializingBean {
         logger.info("轮询返回的："+result);
         return Result.success(result);
     }
+    /*
+    * 获取秒杀地址
+    * */
+    @RequestMapping(value = "/path" ,method = RequestMethod.GET)
+    @ResponseBody
+    public Result getSecondkillPath( SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id) {
+        logger.info("=======================SecondController--path:");
+        if (secondkillUser == null) return Result.error(CodeMsg.SESSION_ERROR);
+        String str = MD5Util.md5(UUIDUtil.uuid())+"123456";
+        redisService.set(GoodsKey.getPath,""+secondkillUser.getId()+"_"+goods_id,str);
 
-}
+        return Result.success(str);
+
+    }
+
+    }

@@ -44,7 +44,7 @@
         </td>
         <td>
 
-        		<button class="btn btn-primary btn-block"  id="buyButton" onclick="secondkillButon()">立即秒杀</button>
+        		<button class="btn btn-primary btn-block"  id="buyButton" onclick="getSecondkillPath()">立即秒杀</button>
         		<input type="hidden" name="goods_id" id="goods_id" />
 
         </td>
@@ -85,10 +85,10 @@ function getSeondkillResult(goods_id) {
             if(result<0){
                 layer.msg("哈哈，秒杀不到了吧！！！！")
             }else if(result==0){
-                //继续轮询，30秒后再轮询一次
+                //继续轮询，200毫秒后再轮询一次
                 setTimeout(function () {
                     getSeondkillResult(goods_id)
-                },30);
+                },200);
 
             }else{
                 layer.confirm("恭喜你喔，秒杀到了。查看订单？",{btn:["确定","取消"]},function(){
@@ -96,25 +96,42 @@ function getSeondkillResult(goods_id) {
                     },function(){
                         layer.closeAll();
                     }
-
-
                 )
             }
         },
-
-
         error:function () {
             layer("请求错误");
         }
 
     })
 }
+function getSecondkillPath() {
+    console.log("getSecondkillPath");
+    $.ajax({
+        url:"/SecondkillController/path",
+        type:"GET",
+        data:{
+            goods_id:$("#goods_id").val()
+        },
+        success:function (data) {
+            if(data.code==0){
+               var path = data.data;
+                secondkillButon(path);
+            }else{
+                layer.msg(data.msg);
+            }
+        },
+        error:function () {
+            layer("秒杀按钮请求错误");
+        }
+    })
 
+}
 
-function secondkillButon() {
+function secondkillButon(path) {
     console.log("====secondkill====================");
     $.ajax({
-        url:"/SecondkillController/secondkill",
+        url:"/SecondkillController/"+path+"/secondkill",
         type:"POST",
         data:{
             goods_id:$("#goods_id").val()
