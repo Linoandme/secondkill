@@ -1,6 +1,7 @@
 package com.lino.secondkill.config;
 
 import com.alibaba.druid.util.StringUtils;
+import com.lino.secondkill.access.UserContext;
 import com.lino.secondkill.domain.SecondkillUser;
 import com.lino.secondkill.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     //处理
     @Override
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
-        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
+       /* HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
         String paramToken = request.getParameter(LoginService.COOKIE_NAME_TOKEN);
         String cookieToken = getCookieValue(request,LoginService.COOKIE_NAME_TOKEN);
@@ -35,9 +36,12 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
             return null;
         }
         String token = StringUtils.isEmpty(paramToken)?cookieToken:paramToken;
-        return loginService.getByToken(response,token);
+        return loginService.getByToken(response,token);*/
+        //通过Threadlocal获取user
+       return UserContext.getUser();
     }
 
+/*
     private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
         Cookie[] cookies = request.getCookies();
         if(cookies==null||cookies.length<=0) return null;
@@ -48,6 +52,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         }
         return null;
     }
+*/
 
 
 }

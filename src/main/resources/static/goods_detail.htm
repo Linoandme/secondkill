@@ -43,9 +43,16 @@
         	<span id="miaoshaTip"></span>
         </td>
         <td>
+            <div class="row">
+                <div class="form-inline">
+                <img id = "verifyCodeimg" width="80" height="32" onclick="reflushVerifyCode()" style="display: none" >
+                <input id = "verfiCode" class="form-control" style="display: none" >
 
-        		<button class="btn btn-primary btn-block"  id="buyButton" onclick="getSecondkillPath()">立即秒杀</button>
-        		<input type="hidden" name="goods_id" id="goods_id" />
+        		<button class="btn btn-primary "  id="buyButton" onclick="getSecondkillPath()">立即秒杀</button>
+                </div>
+            </div>
+
+            <input type="hidden" name="goods_id" id="goods_id" />
 
         </td>
      </tr>
@@ -134,7 +141,8 @@ function secondkillButon(path) {
         url:"/SecondkillController/"+path+"/secondkill",
         type:"POST",
         data:{
-            goods_id:$("#goods_id").val()
+            goods_id:$("#goods_id").val(),
+            verfiCode:$("#verfiCode").val()
         },
         success:function (data) {
             console.log("====secondkill");
@@ -190,7 +198,10 @@ function render(detail) {
     $("#goods_price").text(goodsVo.goods_price);
     $("#secondkill_price").text(goodsVo.secondkill_price);
     $("#stock_count").text(goodsVo.stock_count);
+
     countDown();
+
+
 }
 
 function countDown(){
@@ -206,6 +217,9 @@ function countDown(){
 		},1000);
 	}else if(remainSeconds == 0){//秒杀进行中
 		$("#buyButton").attr("disabled", false);
+        $("#verifyCodeimg").attr("src","/SecondkillController/verfiCode?goods_id="+$("#goods_id").val());
+        $("#verifyCodeimg").show();
+        $("#verfiCode").show();
 		if(timeout){
 			clearTimeout(timeout);
 		}
@@ -213,7 +227,14 @@ function countDown(){
 	}else{//秒杀已经结束
 		$("#buyButton").attr("disabled", true);
 		$("#miaoshaTip").html("秒杀已经结束");
+        $("#verifyCodeimg").hide();
+        $("#verifyCode").hide();
 	}
+}
+function reflushVerifyCode() {
+    console.log("==reflushVerifyCode")
+    $("#verifyCodeimg").attr("src","/SecondkillController/verfiCode?goods_id="+$("#goods_id").val()+"&timestamp="+new Date().getTime());
+
 }
 
 </script>

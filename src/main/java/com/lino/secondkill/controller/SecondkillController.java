@@ -1,5 +1,6 @@
 package com.lino.secondkill.controller;
 
+import com.lino.secondkill.access.AccessLimit;
 import com.lino.secondkill.domain.OrderInfo;
 import com.lino.secondkill.domain.SecondkillOrder;
 import com.lino.secondkill.domain.SecondkillUser;
@@ -24,6 +25,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +76,8 @@ public class SecondkillController implements InitializingBean {
 
     @RequestMapping(value = "/{path}/secondkill" ,method = RequestMethod.POST)
     @ResponseBody
-    public Result secondkill(SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id, @PathVariable("path")  String path){
+    public Result secondkill(SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id,
+                             @PathVariable("path")  String path,@RequestParam(value = "verfiCode" ,defaultValue = "0")  int verfiCode){
         logger.info("=======================SecondController--secondkill:");
         if(secondkillUser==null) return Result.error(CodeMsg.SESSION_ERROR);
 
@@ -84,6 +91,10 @@ public class SecondkillController implements InitializingBean {
         //验证path
         boolean ispath = checkPath(secondkillUser,goods_id,path);
         if(!ispath){
+            return Result.error(CodeMsg.REQUEST_ILLEAGE);
+        }
+        boolean isVerifyCode = secondkillService.checkVerfiCode(secondkillUser,goods_id,verfiCode);
+        if(isVerifyCode){
             return Result.error(CodeMsg.REQUEST_ILLEAGE);
         }
 
@@ -160,6 +171,7 @@ public class SecondkillController implements InitializingBean {
     /*
     * 获取秒杀地址
     * */
+    @AccessLimit(second = 5,maxCount = 5,needLogin=true)
     @RequestMapping(value = "/path" ,method = RequestMethod.GET)
     @ResponseBody
     public Result getSecondkillPath( SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id) {
@@ -171,5 +183,27 @@ public class SecondkillController implements InitializingBean {
         return Result.success(str);
 
     }
+
+
+    @RequestMapping(value = "/verfiCode" ,method = RequestMethod.GET)
+    @ResponseBody
+    public Result verfiCode(HttpServletResponse response,SecondkillUser secondkillUser, @RequestParam("goods_id") long goods_id) {
+        logger.info("=======================SecondController--verfiCode:");
+        if (secondkillUser == null) return Result.error(CodeMsg.SESSION_ERROR);
+        try{
+            BufferedImage image =  secondkillService.createVerifyCode(secondkillUser,goods_id);
+            OutputStream outputStream = response.getOutputStream();
+            ImageIO.write(image,"JPEG",outputStream);
+            outputStream.flush();
+            outputStream.close();
+            return Result.success(null);
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.error(CodeMsg.SECONDKILL_FAILE);
+        }
+
+
+    }
+
 
     }
